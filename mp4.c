@@ -54,7 +54,7 @@ static int get_inode_sid(struct inode *inode)
 		return 0;
 	}
 
-	ret = inode->i_op->getxattx(dentry, XATTR_NAME_MP4, buffer, size);
+	ret = inode->i_op->getxattr(dentry, XATTR_NAME_MP4, buffer, size);
 	if(ret <= 0) {
 		dput(dentry);
 		kfree(buffer);
@@ -86,7 +86,6 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	int sid;
 	struct dentry * dentry;
 	struct inode * inode;
-	struct mp4_security * new_blob;
 	
 	// if creds already prepared
 	if (bprm->cred_prepared){
