@@ -110,11 +110,11 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	}
 
 	// read the xattr value of the inode used to create the process
-	sid = get_inode_sid(bprm-> file->f_inode);
-	current = bprm->cred->security;
-	
+	sid = get_inode_sid(bprm->file->f_inode);
+	current = (mp4_security *)(bprm->cred->security);
+
 	if (sid == MP4_TARGET_SID) {
-		current ->mp4_flags = sid;
+		current->mp4_flags = sid;
 	}
 
 	return 0;
