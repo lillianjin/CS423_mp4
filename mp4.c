@@ -89,6 +89,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	 */
 
 	int sid;
+	struct mp4_security * current;
 	
 	pr_info("mp4 set credentials for a new task..");
 
@@ -110,9 +111,10 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 
 	// read the xattr value of the inode used to create the process
 	sid = get_inode_sid(bprm-> file->f_inode);
-
+	current = bprm->cred->security;
+	
 	if (sid == MP4_TARGET_SID) {
-		 (bprm->cred->security)->mp4_flags = sid;
+		current ->mp4_flags = sid;
 	}
 
 	return 0;
