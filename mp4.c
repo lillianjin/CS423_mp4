@@ -208,16 +208,15 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * Add your code here
 	 * ...
 	 */
-	int sid = get_inode_sid(inode);
-	char * ptr1, ptr2, ptr3;
+	// int sid = get_inode_sid(inode);
 
-	if(!current_cred() || !dir || !inode){
-		return -EOPNOTSUPP;
-	}
+	// if( !dir || !inode || !current_cred() || !(current_cred() -> security)) {
+	// 	return -EOPNOTSUPP;
+	// }
 
-	if(!(struct mp4_security *)(current_cred() - > security)){
-		return -EOPNOTSUPP;
-	}
+	// if(((current_cred() -> security) -> mp4_flags) == MP4_TARGET_SID) {
+		
+	// }
 
 
 	return 0;
