@@ -23,8 +23,53 @@ static int get_inode_sid(struct inode *inode)
 	 * Add your code here
 	 * ...
 	 */
-	return 0;
+	struct dentry *dentry;
+	int sid, size = 128, ret;
+	char * buffer;
+
+	if(!inode){
+		pr_err("inode is null\n");
+		return ENOENT;
+	}
+
+	// grab a hashed alias of inode
+	dentry = d_find_alias(inode);
+	if(!dentry){
+		pr_err("dentry is null\n");
+		return ENOENT;
+	} 
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if(!buffer){
+		dput(dentry);
+		pr_err("buffer not allocated\n");
+		return -ENOMEM;
+	}
+	
+	// get xattr of this inode
+	if (!inode->i_op->getxattr) {
+		kfree(buffer);
+		dput(dentry);
+		pr_err("xattr not exist\n");
+		return -ENOENT;
+	}
+
+	ret = inode->i_op->getxattr(dentry, XATTR_NAME_MP4, buffer, size);
+	if(ret < 0 || ret == -ERANGE) {
+		dput(dentry);
+		kfree(buffer);
+		return -ERANGE;
+	}
+
+	size = ret;
+	buffer[size] = '\0';
+	sid = __cred_ctx_to_sid(buffer);
+	kfree(buffer);
+	dput(dentry);
+
+	return sid;
 }
+
 
 /**
  * mp4_bprm_set_creds - Set the credentials for a new task
@@ -39,6 +84,42 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	 * Add your code here
 	 * ...
 	 */
+	int sid;
+	// struct dentry * dentry;
+	struct inode * inode;
+	
+	pr_info("mp4 set credentials for a new task..");
+
+	// if creds already prepared
+	if (bprm->cred_prepared){
+		pr_info("creds already prepared");
+    	return ENOENT;
+	}
+
+	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bprm->file){
+		pr_info("cred is NULL");
+    	return ENOENT;
+	}
+
+	// dentry = bprm -> file -> f_path.dentry;
+	// if(!dentry){
+	// 	pr_info("dentry is NULL");
+    // 	return ENOENT;
+	// }
+
+	inode = bprm -> file -> f_inode;
+	if(!inode){
+		pr_info("inode is NULL");
+    	return ENOENT;
+	}
+
+	// read the xattr value of the inode used to create the process
+	// sid = get_inode_sid(inode);
+
+	// if (sid == MP4_TARGET_SID) {
+	// 	 ((struct mp4_security*)(bprm -> cred -> security)) -> mp4_flags = MP4_TARGET_SID;
+	// }
+	
 	return 0;
 }
 
