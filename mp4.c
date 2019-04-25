@@ -27,7 +27,7 @@ static int get_inode_sid(struct inode *inode)
 	int sid, size, ret;
 	char * buffer;
 
-	size = 48;
+	size = 100;
 
 	if(!inode){
 		pr_err("get_inode_sid: inode is null\n");
@@ -210,15 +210,33 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * Add your code here
 	 * ...
 	 */
-	// int sid = get_inode_sid(inode);
+	int sid;
+	char *tmp;
 
-	// if( !dir || !inode || !current_cred() || !(current_cred() -> security)) {
-	// 	return -EOPNOTSUPP;
-	// }
+	if( !dir || !inode || !current_cred() || !(current_cred() -> security)) {
+		return -EOPNOTSUPP;
+	}
 
-	// if(((current_cred() -> security) -> mp4_flags) == MP4_TARGET_SID) {
-		
-	// }
+	sid = get_inode_sid(inode);
+	if(sid == MP4_TARGET_SID) {
+		if(XATTR_NAME_MP4){
+			*name = XATTR_NAME_MP4;
+			*len = sizeof(XATTR_NAME_MP4);
+		} else {
+			return -ENOMEM;
+		}
+
+		if(S_ISDIR(inode->i_mode)) {
+			tmp = kstrdup("dir-write", GFP_KERNEL);
+		} else {
+			tmp = kstrdup("read-write", GFP_KERNEL);
+		}
+
+		if(!tmp){
+			return -ENOMEM;
+		}
+		*value = temp;
+	}
 	return 0;
 }
 
