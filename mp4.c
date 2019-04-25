@@ -235,7 +235,7 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 		if(!tmp){
 			return -ENOMEM;
 		}
-		*value = temp;
+		*value = tmp;
 	}
 	return 0;
 }
