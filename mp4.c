@@ -48,12 +48,13 @@ static int get_inode_sid(struct inode *inode)
 	
 	// get xattr of this inode
 	if (!inode->i_op->getxattr) {
-		kfree(buffer);
 		dput(dentry);
+		kfree(buffer);
 		pr_err("xattr not exist\n");
 		return -ENOENT;
 	}
 
+	// return value of the getxattr()
 	ret = inode->i_op->getxattr(dentry, XATTR_NAME_MP4, buffer, size);
 	if(ret < 0 || ret == -ERANGE) {
 		dput(dentry);
@@ -61,8 +62,7 @@ static int get_inode_sid(struct inode *inode)
 		return -ERANGE;
 	}
 
-	size = ret;
-	buffer[size] = '\0';
+	buffer[ret] = '\0';
 	sid = __cred_ctx_to_sid(buffer);
 	kfree(buffer);
 	dput(dentry);
@@ -114,11 +114,11 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	}
 
 	// read the xattr value of the inode used to create the process
-	// sid = get_inode_sid(inode);
+	sid = get_inode_sid(inode);
 
-	// if (sid == MP4_TARGET_SID) {
-	// 	 ((struct mp4_security*)(bprm -> cred -> security)) -> mp4_flags = MP4_TARGET_SID;
-	// }
+	if (sid == MP4_TARGET_SID) {
+		 ((struct mp4_security*)(bprm -> cred -> security)) -> mp4_flags = MP4_TARGET_SID;
+	}
 	
 	return 0;
 }
@@ -213,6 +213,15 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * Add your code here
 	 * ...
 	 */
+	// int sid = get_inode_sid(inode);
+
+	// if( !dir || !inode || !current_cred() || !(current_cred() -> security)) {
+	// 	return -EOPNOTSUPP;
+	// }
+
+	// if(((current_cred() -> security) -> mp4_flags) == MP4_TARGET_SID) {
+		
+	// }
 	return 0;
 }
 
