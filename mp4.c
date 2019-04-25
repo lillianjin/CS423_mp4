@@ -55,6 +55,18 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 * Add your code here
 	 * ...
 	 */
+	struct mp4_security * new_blob;
+	if(!cred){
+		return -ENOENT;
+	}
+	new_blob = kzalloc(sizeof(struct mp4_security), gfp);
+	if(!new_blob){
+		return -ENOMEM;
+	}
+	//initialized the label as MP4_NO_ACCESS
+	new_blob -> mp4_flags = MP4_NO_ACCESS;
+	// hook the pointer to new blob
+	cred -> security = new_blob;
 	return 0;
 }
 
@@ -71,6 +83,11 @@ static void mp4_cred_free(struct cred *cred)
 	 * Add your code here
 	 * ...
 	 */
+	if(!cred || !cred->security){
+		return;
+	}
+	cred->security = NULL;
+	kfree(cred -> security);
 }
 
 /**
@@ -84,6 +101,10 @@ static void mp4_cred_free(struct cred *cred)
 static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 			    gfp_t gfp)
 {
+	mp4_cred_alloc_blank(new, gfp);
+	if(old->security){
+		new -> security = old -> security;
+	}
 	return 0;
 }
 
