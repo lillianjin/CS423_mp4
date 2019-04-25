@@ -39,6 +39,41 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	 * Add your code here
 	 * ...
 	 */
+	int sid;
+	struct dentry * dentry;
+	struct inode * inode;
+	struct mp4_security * new_blob;
+	
+	// if creds already prepared
+	if (bprm->cred_prepared){
+		pr_info("creds already prepared");
+    	return 0;
+	}
+
+	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bptm->file){
+		pr_info("cred is NULL");
+    	return 0;
+	}
+
+	dentry = bprm -> file -> f_path.dentry;
+	if(!dentry){
+		pr_info("dentry is NULL");
+    	return 0;
+	}
+
+	inode = dentry -> d_inode;
+	if(!inode){
+		pr_info("inode is NULL");
+    	return 0;
+	}
+
+	// read the xattr value of the inode used to create the process
+	sid = get_inode_sid(inode, dentry);
+
+	if (sid == MP4_TARGET_SID) {
+		 ((struct mp4_security*)(bprm -> cred -> security)) -> mp4_flags = MP4_TARGET_SID;
+	}
+	
 	return 0;
 }
 
@@ -55,6 +90,18 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 * Add your code here
 	 * ...
 	 */
+	struct mp4_security * new_blob;
+	if(!cred){
+		return -ENOMEM;
+	}
+	new_blob = kmalloc(sizeof(struct mp4_security), gfp);
+	if(!new_blob){
+		return -ENOMEM;
+	}
+	//initialized the label as MP4_NO_ACCESS
+	new_blob -> mp4_flags = MP4_NO_ACCESS;
+	// hook the pointer to new blob
+	cred -> security = new_blob;
 	return 0;
 }
 
@@ -71,6 +118,11 @@ static void mp4_cred_free(struct cred *cred)
 	 * Add your code here
 	 * ...
 	 */
+	if(!cred || !cred->security){
+		return;
+	}
+	cred->security = NULL;
+	kfree(cred -> security);
 }
 
 /**
@@ -84,6 +136,11 @@ static void mp4_cred_free(struct cred *cred)
 static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 			    gfp_t gfp)
 {
+	mp4_cred_alloc_blank(new, gfp);
+	if(old->security){
+		new -> security = old -> security;
+	}
+
 	return 0;
 }
 
