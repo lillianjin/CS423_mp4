@@ -56,6 +56,7 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 * ...
 	 */
 	struct mp4_security * new_blob;
+	pr_info("mp4 allocates a blank label..");
 	if(!cred){
 		return -ENOENT;
 	}
@@ -83,6 +84,7 @@ static void mp4_cred_free(struct cred *cred)
 	 * Add your code here
 	 * ...
 	 */
+	pr_info("mp4 free a security label..");
 	if(!cred || !cred->security){
 		return;
 	}
@@ -102,6 +104,7 @@ static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 			    gfp_t gfp)
 {
 	mp4_cred_alloc_blank(new, gfp);
+	pr_info("mp4 prepare a new credential for modification..");
 	if(old->security){
 		new -> security = old -> security;
 	}
