@@ -29,21 +29,21 @@ static int get_inode_sid(struct inode *inode)
 
 	if(!inode){
 		pr_err("inode is null\n");
-		return 0;
+		return ENOENT;
 	}
 
 	// grab a hashed alias of inode
 	dentry = d_find_alias(inode);
 	if(!dentry){
 		pr_err("dentry is null\n");
-		return 0;
+		return ENOENT;
 	} 
 
 	buffer = kmalloc(size, GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
 		pr_err("buffer not allocated\n");
-		return 0;
+		return -ENOMEM;
 	}
 	
 	// get xattr of this inode
@@ -51,14 +51,14 @@ static int get_inode_sid(struct inode *inode)
 		kfree(buffer);
 		dput(dentry);
 		pr_err("xattr not exist\n");
-		return 0;
+		return -ENOENT;
 	}
 
 	ret = inode->i_op->getxattr(dentry, XATTR_NAME_MP4, buffer, size);
-	if(ret <= 0) {
+	if(ret < 0 || ret == -ERANGE) {
 		dput(dentry);
 		kfree(buffer);
-		return 0;
+		return -ERANGE;
 	}
 
 	size = ret;
@@ -90,24 +90,24 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	// if creds already prepared
 	if (bprm->cred_prepared){
 		pr_info("creds already prepared");
-    	return 0;
+    	return ENOENT;
 	}
 
 	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bprm->file){
 		pr_info("cred is NULL");
-    	return 0;
+    	return ENOENT;
 	}
 
 	dentry = bprm -> file -> f_path.dentry;
 	if(!dentry){
 		pr_info("dentry is NULL");
-    	return 0;
+    	return ENOENT;
 	}
 
 	inode = dentry -> d_inode;
 	if(!inode){
 		pr_info("inode is NULL");
-    	return 0;
+    	return ENOENT;
 	}
 
 	// read the xattr value of the inode used to create the process
@@ -208,6 +208,12 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * Add your code here
 	 * ...
 	 */
+	// int sid = get_inode_sid(inode);
+	// char * ptr1, ptr2, ptr3;
+
+	// if(!current_cred() || !dir || !inode){
+
+	// }
 	return 0;
 }
 
@@ -227,6 +233,7 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	 * Add your code here
 	 * ...
 	 */
+	
 	return 0;
 }
 
