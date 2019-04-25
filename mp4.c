@@ -9,7 +9,7 @@
 #include <linux/binfmts.h>
 #include "mp4_given.h"
 
-#define PATH_BUF_SIZE 256
+#define CTX_BUF_SIZE 48
 
 /**
  * get_inode_sid - Get the inode mp4 security label id
