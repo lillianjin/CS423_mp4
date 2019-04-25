@@ -64,8 +64,8 @@ static int get_inode_sid(struct inode *inode)
 
 	buffer[ret] = '\0';
 	sid = __cred_ctx_to_sid(buffer);
-	kfree(buffer);
 	dput(dentry);
+	kfree(buffer);
 
 	return sid;
 }
@@ -93,12 +93,12 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	// if creds already prepared
 	if (bprm->cred_prepared){
 		pr_info("creds already prepared");
-    	return ENOENT;
+    	return -ENOENT;
 	}
 
-	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bprm->file){
+	if(!bprm || !bprm->cred || !bprm -> cred -> security || !bprm->file){
 		pr_info("cred is NULL");
-    	return ENOENT;
+    	return -ENOENT;
 	}
 
 	// dentry = bprm -> file -> f_path.dentry;
@@ -110,7 +110,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	inode = bprm -> file -> f_inode;
 	if(!inode){
 		pr_info("inode is NULL");
-    	return ENOENT;
+    	return -ENOENT;
 	}
 
 	// read the xattr value of the inode used to create the process
