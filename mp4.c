@@ -9,8 +9,6 @@
 #include <linux/binfmts.h>
 #include "mp4_given.h"
 
-#define CTX_BUF_SIZE 48
-
 /**
  * get_inode_sid - Get the inode mp4 security label id
  *
@@ -25,12 +23,11 @@ static int get_inode_sid(struct inode *inode)
 	 * Add your code here
 	 * ...
 	 */
-	/*
 	struct dentry *dentry;
 	int sid, size, ret;
 	char * buffer;
 
-	size = 128;
+	size = 48;
 
 	if(!inode){
 		pr_err("get_inode_sid: inode is null\n");
@@ -61,7 +58,7 @@ static int get_inode_sid(struct inode *inode)
 
 	// return value of the getxattr()
 	ret = inode->i_op->getxattr(dentry, XATTR_NAME_MP4, buffer, size);
-	if(ret < 0 || ret == -ERANGE) {
+	if(ret <= 0 || ret == -ERANGE) {
 		dput(dentry);
 		kfree(buffer);
 		return MP4_NO_ACCESS;
@@ -73,56 +70,7 @@ static int get_inode_sid(struct inode *inode)
 	kfree(buffer);
 
 	return sid;
-	*/
-		int sid;
-
-	if(!inode) {
-		pr_err("get_inode_sid: inode is null! \n");
-		goto NO_ACCESS;
-	}
-
-	struct dentry *den = d_find_alias(inode);
-	if (!den) {
-		pr_err("get_inode_sid: fail to get dentry\n");
-		goto NO_ACCESS;
-	}
-
-	char *cred_ctx = kmalloc(CTX_BUF_SIZE, GFP_KERNEL);
-	if(!cred_ctx) {
-		dput(den);
-		pr_err("get_inode_sid: fail to allocate cred_ctx\n");
-		goto NO_ACCESS;
-	}
-
-	// get xattr of this inode
-	if (!inode->i_op->getxattr) { // error handling for file system like proc
-		dput(den);
-		kfree(cred_ctx);
-		goto NO_ACCESS;
-	}
-
-	int ret_sz = inode->i_op->getxattr(den, XATTR_NAME_MP4, cred_ctx, CTX_BUF_SIZE);
-	if (ret_sz <= 0) {
-		// if (printk_ratelimit()) {
-		// 	pr_err("get_inode_sid: fail to getxattr, ret_sz %d !\n",ret_sz);
-		// }
-		dput(den);
-		kfree(cred_ctx);
-		goto NO_ACCESS;
-	}
-	cred_ctx[ret_sz] = '\0';
-
-	// translate cred context into sid
-	sid = __cred_ctx_to_sid(cred_ctx);
-
-	// clean up
-	kfree(cred_ctx);
-	dput(den);
-
-	return sid;
-
-	NO_ACCESS:
-		return MP4_NO_ACCESS;
+	
 }
 
 
@@ -140,7 +88,6 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	 * ...
 	 */
 
-	/*
 	int sid;
 	
 	pr_info("mp4 set credentials for a new task..");
@@ -148,50 +95,25 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	// if creds already prepared
 	if (bprm->cred_prepared){
 		pr_info("creds already prepared");
-    	return -ENOENT;
+    	return MP4_NO_ACCESS;
 	}
 
-	if(!bprm || !bprm->cred || !bprm->cred->security || !bprm->file){
+	if(!bprm || !bprm->cred || !bprm->cred->security ){
 		pr_info("cred is NULL");
-    	return -ENOENT;
+    	return MP4_NO_ACCESS;
 	}
 
-	if(!bprm-> file->f_inode){
-		pr_info("inode is NULL");
-    	return -ENOENT;
+	if(!bprm->file || !bprm-> file->f_inode){
+		pr_info("file is NULL");
+    	return MP4_NO_ACCESS;
 	}
 
 	// read the xattr value of the inode used to create the process
 	sid = get_inode_sid(bprm-> file->f_inode);
 
 	if (sid == MP4_TARGET_SID) {
-		 ((struct mp4_security*)(bprm->cred->security))->mp4_flags = sid;
+		 (bprm->cred->security)->mp4_flags = sid;
 	}
-	*/
-
-	if (bprm->cred_prepared){
-     return 0;
-	 }
-
-	 // 1. find cred and blob
-	 if (bprm->cred == NULL || bprm->cred->security == NULL) {
-		 pr_err("cred or blob is NULL!");
-		 return 0;
-	 }
-	 struct mp4_security *blob = bprm->cred->security;
-
-	 // 2. get sid of the inode that create this process
-	 if (bprm->file == NULL || bprm->file->f_inode == NULL) {
-		 pr_err("file or f_inode is NULL!");
-		 return 0;
-	 }
-	 int sid = get_inode_sid(bprm->file->f_inode);
-
-	 // 3. set task blob to this sid
-	 if (sid == MP4_TARGET_SID) {
-		 blob->mp4_flags = sid;
-	 }
-
 
 	return 0;
 }
