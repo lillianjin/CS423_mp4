@@ -23,7 +23,51 @@ static int get_inode_sid(struct inode *inode)
 	 * Add your code here
 	 * ...
 	 */
-	return 0;
+	struct dentry *dentry;
+	int sid, size = 128, ret;
+	char * buffer;
+
+	if(!inode){
+		pr_err("inode is null\n");
+		return 0;
+	}
+
+	// grab a hashed alias of inode
+	dentry = d_find_alias(inode);
+	if(!dentry){
+		pr_err("dentry is null\n");
+		return 0;
+	} 
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if(!buffer){
+		dput(dentry);
+		pr_err("buffer not allocated\n");
+		return 0;
+	}
+	
+	// get xattr of this inode
+	if (!inode->i_op->getxattr) {
+		kfree(buffer);
+		dput(dentry);
+		pr_err("xattr not exist\n");
+		return 0;
+	}
+
+	ret = inode->i_op->getxattx(dentry, XATTR_NAME_MP4, buffer, size);
+	if(ret <= 0) {
+		dput(dentry);
+		kfree(buffer);
+		return 0;
+	}
+
+	size = ret;
+	buffer[size] = '\0';
+	sid = __cred_ctx_to_sid(buffer);
+	kfree(buffer);
+	dput(dentry);
+
+	return sid;
 }
 
 /**
@@ -50,7 +94,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
     	return 0;
 	}
 
-	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bptm->file){
+	if(!bprm->cred || !bprm -> cred -> security || !bprm || !bprm->file){
 		pr_info("cred is NULL");
     	return 0;
 	}
@@ -68,7 +112,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	}
 
 	// read the xattr value of the inode used to create the process
-	sid = get_inode_sid(inode, dentry);
+	sid = get_inode_sid(inode);
 
 	if (sid == MP4_TARGET_SID) {
 		 ((struct mp4_security*)(bprm -> cred -> security)) -> mp4_flags = MP4_TARGET_SID;
