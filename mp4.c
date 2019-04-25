@@ -29,21 +29,21 @@ static int get_inode_sid(struct inode *inode)
 
 	if(!inode){
 		pr_err("inode is null\n");
-		return ENOENT;
+		return MP4_NO_ACCESS;
 	}
 
 	// grab a hashed alias of inode
 	dentry = d_find_alias(inode);
 	if(!dentry){
 		pr_err("dentry is null\n");
-		return ENOENT;
+		return MP4_NO_ACCESS;
 	} 
 
 	buffer = kmalloc(size, GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
 		pr_err("buffer not allocated\n");
-		return -ENOMEM;
+		return MP4_NO_ACCESS;
 	}
 	
 	// get xattr of this inode
@@ -51,7 +51,7 @@ static int get_inode_sid(struct inode *inode)
 		dput(dentry);
 		kfree(buffer);
 		pr_err("xattr not exist\n");
-		return -ENOENT;
+		return MP4_NO_ACCESS;
 	}
 
 	// return value of the getxattr()
@@ -59,7 +59,7 @@ static int get_inode_sid(struct inode *inode)
 	if(ret < 0 || ret == -ERANGE) {
 		dput(dentry);
 		kfree(buffer);
-		return -ERANGE;
+		return MP4_NO_ACCESS;
 	}
 
 	buffer[ret] = '\0';
