@@ -114,7 +114,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	curr = (struct mp4_security *)(bprm->cred->security);
 
 	if (sid == MP4_TARGET_SID) {
-		current->mp4_flags = sid;
+		curr->mp4_flags = sid;
 	}
 
 	return 0;
