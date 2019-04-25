@@ -84,7 +84,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	 * ...
 	 */
 	int sid;
-	struct dentry * dentry;
+	// struct dentry * dentry;
 	struct inode * inode;
 	
 	// if creds already prepared
@@ -98,13 +98,13 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
     	return ENOENT;
 	}
 
-	dentry = bprm -> file -> f_path.dentry;
-	if(!dentry){
-		pr_info("dentry is NULL");
-    	return ENOENT;
-	}
+	// dentry = bprm -> file -> f_path.dentry;
+	// if(!dentry){
+	// 	pr_info("dentry is NULL");
+    // 	return ENOENT;
+	// }
 
-	inode = dentry -> d_inode;
+	inode = bprm -> file -> f_inode;
 	if(!inode){
 		pr_info("inode is NULL");
     	return ENOENT;
@@ -135,7 +135,7 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 */
 	struct mp4_security * new_blob;
 	if(!cred){
-		return -ENOMEM;
+		return -ENOENT;
 	}
 	new_blob = kmalloc(sizeof(struct mp4_security), gfp);
 	if(!new_blob){
@@ -208,12 +208,18 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * Add your code here
 	 * ...
 	 */
-	// int sid = get_inode_sid(inode);
-	// char * ptr1, ptr2, ptr3;
+	int sid = get_inode_sid(inode);
+	char * ptr1, ptr2, ptr3;
 
-	// if(!current_cred() || !dir || !inode){
+	if(!current_cred() || !dir || !inode){
+		return -EOPNOTSUPP;
+	}
 
-	// }
+	if(!(struct mp4_security *)(current_cred() - > security)){
+		return -EOPNOTSUPP;
+	}
+
+
 	return 0;
 }
 
