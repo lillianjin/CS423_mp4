@@ -315,6 +315,7 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	case MP4_RW_DIR:
 		return 0;
 
+	}
 
 }
 
