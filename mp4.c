@@ -256,7 +256,66 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	 * Add your code here
 	 * ...
 	 */
-	return 0;
+	switch (osid)
+	{
+	case MP4_NO_ACCESS:
+		return -EACCES;
+
+	case MP4_READ_OBJ:
+		if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
+			return -EACCES;
+		} else {
+			return 0;
+		}
+
+	case MP4_WRITE_OBJ:
+		if(ssid == MP4_TARGET_SID){
+			if((mask & MAY_EXEC) || (mask & MAY_READ)){
+				return -EACCES;
+			} else {
+				return 0;
+			}
+		} else{
+			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
+				return -EACCES;
+			} else {
+				return 0;
+			}
+		}
+		
+	case MP4_READ_WRITE:
+		if(ssid == MP4_TARGET_SID){
+			if(mask & MAY_EXEC){
+				return -EACCES;
+			} else {
+				return 0;
+			}
+		} else {
+			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
+				return -EACCES;
+			} else {
+				return 0;
+			}
+		}
+
+	case MP4_EXEC_OBJ:
+		if((mask & MAY_APPEND) || (mask & MAY_WRITE)){
+			return -EACCES;
+		} else {
+			return 0;
+		}
+
+	case MP4_READ_DIR:
+		if(mask & MAY_WRITE){
+			return -EACCES;
+		} else {
+			return 0;
+		}
+	
+	case MP4_RW_DIR:
+		return 0;
+
+
 }
 
 /**
@@ -276,6 +335,69 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	 * Add your code here
 	 * ...
 	 */
+	struct dentry * dentry;
+	char * checked_path, * buffer;
+	int size = 100;
+	int ssid, osid, permission;
+
+	// no permission to check
+	if(!mask){
+		return -EACCES;
+	}
+
+	//obtain the path of the inode being checked
+	dentry = d_find_alias(inode);
+
+	if(!dentry){
+		pr_err("mp4_inode_permission: dentry is null\n");
+		return -EACCES;
+	} 
+
+	buffer = kmalloc(size, GFP_KERNEL);
+	if(!buffer){
+		dput(dentry);
+		pr_err("mp4_inode_permission: buffer not allocated\n");
+		return -EACCES;
+	}
+
+	// get checked path
+	checked_path = dentry_path_raw(dentry, buffer, size);
+	if(!checked_path){
+		kfree(buffer);
+		dput(dentry);
+		pr_err("mp4_inode_permission: path not found\n");
+		return -EACCES;
+	}
+
+	// check if should skip
+	if(mp4_should_skip_path(checked_path)){
+		kfree(buffer);
+		dput(dentry);
+		pr_err("mp4_inode_permission: skip the path\n");
+		return 0;
+	}
+
+	if(!current_cred() || !current_cred()->security){
+		kfree(buffer);
+		dput(dentry);
+		pr_err("mp4_inode_permission: current cred not found\n");
+		return -EACCES;
+	}
+
+	ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
+	osid = get_inode_sid(inode);
+	if(printk_ratelimit()) {
+		pr_info("SSID: %d\t OSID:%d\tmask:%d", ssid, osid, mask);
+	}
+
+	permission = mp4_has_permission(ssid, osid, mask);
+	if(printk_ratelimit()) {
+		pr_info("permission:%d", permission);
+	}
+
+	dput(dentry);
+	kfree(checked_path);
+
 	return 0;
 }
 
