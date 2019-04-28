@@ -389,14 +389,19 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		return 0;
 	}
 
-	if(!current_cred() || !current_cred()->security){
+	if(!current_cred()){
 		kfree(buffer);
 		dput(dentry);
 		pr_err("mp4_inode_permission: current cred not found\n");
 		return -EACCES;
 	}
 
-	ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
+	if(!current_cred()->security){
+		ssid = MP4_NO_ACCESS;
+	} else {
+		ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
+	}
+
 	osid = get_inode_sid(inode);
 	if(printk_ratelimit()) {
 		pr_info("SSID: %d\t OSID:%d\tmask:%d", ssid, osid, mask);
@@ -408,7 +413,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	}
 
 	dput(dentry);
-	kfree(checked_path);
+	kfree(buffer);
 
 	return 0;
 }
