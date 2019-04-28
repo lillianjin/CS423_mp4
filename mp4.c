@@ -341,6 +341,10 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	int size = 100;
 	int ssid, osid, permission;
 
+	if(!inode){
+		return -EACCES;
+	}
+
 	// no permission to check
 	if(!mask){
 		return -EACCES;
@@ -393,7 +397,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
-		pr_info("permission:%d", permission);
+		pr_info("permission: %d", permission);
 	}
 
 	dput(dentry);
