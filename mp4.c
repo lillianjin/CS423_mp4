@@ -166,8 +166,8 @@ static void mp4_cred_free(struct cred *cred)
 	if(!cred || !cred->security){
 		return;
 	}
-	cred->security = NULL;
 	kfree(cred -> security);
+	cred->security = NULL;
 }
 
 /**
@@ -387,7 +387,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(mp4_should_skip_path(checked_path)){
 		kfree(buffer);
 		dput(dentry);
-		pr_err("mp4_inode_permission: skip the path\n");
+		// pr_err("mp4_inode_permission: skip the path\n");
 		return 0;
 	}
 
@@ -406,12 +406,11 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	osid = get_inode_sid(inode);
 	if(printk_ratelimit()) {
-		pr_info("SSID: %d, OSID:%d, mask:%d\n", ssid, osid, mask);
 	}
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
-		pr_info("permission: %d\n", permission);
+		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d", ssid, osid, mask, permission);
 	}
 
 	kfree(buffer);
