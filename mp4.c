@@ -349,11 +349,13 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	int ssid, osid, permission;
 
 	if(!inode){
+		pr_err("mp4_inode_permission: inode is null\n");
 		return -EACCES;
 	}
 
 	// no permission to check
 	if(!mask){
+		pr_err("mp4_inode_permission: mask is null\n");
 		return -EACCES;
 	}
 
@@ -404,16 +406,16 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	osid = get_inode_sid(inode);
 	if(printk_ratelimit()) {
-		pr_info("SSID: %d\t OSID:%d\tmask:%d", ssid, osid, mask);
+		pr_info("SSID: %d, OSID:%d, mask:%d\n", ssid, osid, mask);
 	}
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
-		pr_info("permission: %d", permission);
+		pr_info("permission: %d\n", permission);
 	}
 
-	dput(dentry);
 	kfree(buffer);
+	dput(dentry);
 
 	return 0;
 }
