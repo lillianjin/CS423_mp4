@@ -256,67 +256,74 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	 * Add your code here
 	 * ...
 	 */
+	int rc = 0;
 	switch (osid)
 	{
 	case MP4_NO_ACCESS:
-		return -EACCES;
+		rc = -EACCES;
+		break;
 
 	case MP4_READ_OBJ:
 		if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
-			return -EACCES;
+			rc = -EACCES;
 		} else {
-			return 0;
+			rc = 0;
 		}
+		break;
 
 	case MP4_WRITE_OBJ:
 		if(ssid == MP4_TARGET_SID){
 			if((mask & MAY_EXEC) || (mask & MAY_READ)){
-				return -EACCES;
+				rc = -EACCES;
 			} else {
-				return 0;
+				rc = 0;
 			}
 		} else{
 			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
-				return -EACCES;
+				rc = -EACCES;
 			} else {
-				return 0;
+				rc = 0;
 			}
 		}
+		break;
 		
 	case MP4_READ_WRITE:
 		if(ssid == MP4_TARGET_SID){
 			if(mask & MAY_EXEC){
-				return -EACCES;
+				rc = -EACCES;
 			} else {
-				return 0;
+				rc = 0;
 			}
 		} else {
 			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
-				return -EACCES;
+				rc = -EACCES;
 			} else {
-				return 0;
+				rc = 0;
 			}
 		}
+		break;
 
 	case MP4_EXEC_OBJ:
 		if((mask & MAY_APPEND) || (mask & MAY_WRITE)){
-			return -EACCES;
+			rc = -EACCES;
 		} else {
-			return 0;
+			rc = 0;
 		}
+		break;
 
 	case MP4_READ_DIR:
 		if(mask & MAY_WRITE){
-			return -EACCES;
+			rc = -EACCES;
 		} else {
-			return 0;
+			rc = 0;
 		}
+		break;
 	
 	case MP4_RW_DIR:
-		return 0;
-
+		rc = 0;
+		break;
 	}
-
+	return rc;
 }
 
 /**
