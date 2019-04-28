@@ -30,21 +30,21 @@ static int get_inode_sid(struct inode *inode)
 	size = 100;
 
 	if(!inode){
-		pr_err("get_inode_sid: inode is null\n");
+		// pr_err("get_inode_sid: inode is null\n");
 		return MP4_NO_ACCESS;
 	}
 
 	// grab a hashed alias of inode
 	dentry = d_find_alias(inode);
 	if(!dentry){
-		pr_err("get_inode_sid: dentry is null\n");
+		// pr_err("get_inode_sid: dentry is null\n");
 		return MP4_NO_ACCESS;
 	} 
 
 	buffer = kmalloc(size, GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
-		pr_err("get_inode_sid: buffer not allocated\n");
+		// pr_err("get_inode_sid: buffer not allocated\n");
 		return MP4_NO_ACCESS;
 	}
 	
@@ -52,7 +52,7 @@ static int get_inode_sid(struct inode *inode)
 	if (!inode->i_op->getxattr) {
 		dput(dentry);
 		kfree(buffer);
-		pr_err("get_inode_sid: xattr not exist\n");
+		// pr_err("get_inode_sid: xattr not exist\n");
 		return MP4_NO_ACCESS;
 	}
 
@@ -91,21 +91,21 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	int sid;
 	struct mp4_security * curr;
 	
-	pr_info("mp4 set credentials for a new task..");
+	// pr_info("mp4 set credentials for a new task..");
 
 	// if creds already prepared
 	if (bprm->cred_prepared){
-		pr_info("creds already prepared");
+		// pr_info("creds already prepared");
     	return MP4_NO_ACCESS;
 	}
 
 	if(!bprm || !bprm->cred || !bprm->cred->security ){
-		pr_info("cred is NULL");
+		// pr_info("cred is NULL");
     	return MP4_NO_ACCESS;
 	}
 
 	if(!bprm->file || !bprm-> file->f_inode){
-		pr_info("file is NULL");
+		// pr_info("file is NULL");
     	return MP4_NO_ACCESS;
 	}
 
@@ -134,7 +134,7 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 * ...
 	 */
 	struct mp4_security * new_blob;
-	pr_info("mp4 allocates a blank label..");
+	// pr_info("mp4 allocates a blank label..");
 	if(!cred){
 		return -ENOENT;
 	}
@@ -162,7 +162,7 @@ static void mp4_cred_free(struct cred *cred)
 	 * Add your code here
 	 * ...
 	 */
-	pr_info("mp4 free a security label..");
+	// pr_info("mp4 free a security label..");
 	if(!cred || !cred->security){
 		return;
 	}
@@ -182,7 +182,7 @@ static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 			    gfp_t gfp)
 {
 	mp4_cred_alloc_blank(new, gfp);
-	pr_info("mp4 prepare a new credential for modification..");
+	// pr_info("mp4 prepare a new credential for modification..");
 	if(old->security){
 		new -> security = old -> security;
 	}
@@ -376,13 +376,13 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	int ssid, osid, permission;
 
 	if(!inode){
-		pr_err("mp4_inode_permission: inode is null\n");
+		// pr_err("mp4_inode_permission: inode is null\n");
 		return -EACCES;
 	}
 
 	// no permission to check
 	if(!mask){
-		pr_err("mp4_inode_permission: mask is null\n");
+		// pr_err("mp4_inode_permission: mask is null\n");
 		return -EACCES;
 	}
 
@@ -390,14 +390,14 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	dentry = d_find_alias(inode);
 
 	if(!dentry){
-		pr_err("mp4_inode_permission: dentry is null\n");
+		// pr_err("mp4_inode_permission: dentry is null\n");
 		return -EACCES;
 	} 
 
 	buffer = kmalloc(size, GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
-		pr_err("mp4_inode_permission: buffer not allocated\n");
+		// pr_err("mp4_inode_permission: buffer not allocated\n");
 		return -EACCES;
 	}
 
@@ -406,7 +406,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(!checked_path){
 		kfree(buffer);
 		dput(dentry);
-		pr_err("mp4_inode_permission: path not found\n");
+		// pr_err("mp4_inode_permission: path not found\n");
 		return -EACCES;
 	}
 
@@ -421,7 +421,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(!current_cred()){
 		kfree(buffer);
 		dput(dentry);
-		pr_err("mp4_inode_permission: current cred not found\n");
+		// pr_err("mp4_inode_permission: current cred not found\n");
 		return -EACCES;
 	}
 
