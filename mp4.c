@@ -373,17 +373,18 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	char * checked_path, * buffer;
 	int size = 100;
 	int ssid, osid, permission;
-
+	return 0;
+	
 	if(!inode){
 		// pr_err("mp4_inode_permission: inode is null\n");
 		return 0;
 	}
 
 	// no permission to check
-	if(!mask){
-		// pr_err("mp4_inode_permission: mask is null\n");
-		return 0;
-	}
+	// if(!mask){
+	// 	// pr_err("mp4_inode_permission: mask is null\n");
+	// 	return 0;
+	// }
 
 	//obtain the path of the inode being checked
 	dentry = d_find_alias(inode);
