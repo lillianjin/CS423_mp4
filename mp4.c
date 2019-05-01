@@ -372,7 +372,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	struct dentry * dentry;
 	char * checked_path, * buffer;
 	int size = 256;
-	int ssid, osid, permission;
+	int ssid = MP4_NO_ACCESS, osid, permission;
 	
 	if(!inode){
 		// pr_err("mp4_inode_permission: inode is null\n");
@@ -393,7 +393,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		return 0;
 	} 
 
-	buffer = kmalloc(size, GFP_KERNEL);
+	buffer = kzalloc(size * sizeof(char), GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
 		// pr_err("mp4_inode_permission: buffer not allocated\n");
@@ -416,27 +416,26 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		// pr_err("mp4_inode_permission: skip the path\n");
 		return 0;
 	}
+	
+	osid = get_inode_sid(inode);
+
+	kfree(buffer);
+	dput(dentry);
 
 	if(!current_cred() || current_cred()->security){
-		kfree(buffer);
-		dput(dentry);
 		// pr_err("mp4_inode_permission: current cred not found\n");
 		return 0;
 	}
-	
+
 	ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
-	osid = get_inode_sid(inode);
-	if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
-		return 0;
-	}
+	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
+	// 	return 0;
+	// }
 
 	// permission = mp4_has_permission(ssid, osid, mask);
 	// if(printk_ratelimit()) {
 	// 	pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
 	// }
-
-	kfree(buffer);
-	dput(dentry);
 
 	// return permission;
 	return 0;
