@@ -348,7 +348,6 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 		} else{
 			rc = 0;
 		}
-		break;
 	}
 	return rc;
 }
@@ -432,23 +431,19 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	}
 
 	osid = get_inode_sid(inode);
-	if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
-		return 0;
-	}
+	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
+	// 	return 0;
+	// }
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
 		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
 	}
-	
-	if(permission){
-		return -EACCES;
-	}
 
 	kfree(buffer);
 	dput(dentry);
 
-	return 0;
+	return permission;
 }
 
 
