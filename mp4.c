@@ -264,9 +264,8 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 		if(ssid == MP4_TARGET_SID){
 			rc = -EACCES;
 		} else {
-			if(mask & MAY_ACCESS){
-				rc = -EACCES;
-			}
+			rc = 0;
+			
 		}
 		break;
 
@@ -427,7 +426,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		return 0;
 	}
 
-	ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
+	ssid = (current_cred()->security)->mp4_flags;
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
 	// }
