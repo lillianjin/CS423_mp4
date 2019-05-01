@@ -372,7 +372,8 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	char * checked_path, * buffer;
 	int size = 255;
 	int ssid = MP4_NO_ACCESS, osid, permission;
-	
+	struct mp4_security * curr;
+
 	if(!inode){
 		// pr_err("mp4_inode_permission: inode is null\n");
 		return 0;
@@ -426,7 +427,8 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		return 0;
 	}
 
-	ssid = (struct mp4_security *)(current_cred()->security)->mp4_flags;
+	curr = (struct mp4_security *)(current_cred()->security);
+	ssid = curr->mp4_flags;
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
 	// }
