@@ -371,7 +371,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	 */
 	struct dentry * dentry;
 	char * checked_path, * buffer;
-	int size = 256;
+	int size = 255;
 	int ssid = MP4_NO_ACCESS, osid, permission;
 	
 	if(!inode){
