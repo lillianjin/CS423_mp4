@@ -371,9 +371,8 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	 */
 	struct dentry * dentry;
 	char * checked_path, * buffer;
-	int size = 100;
+	int size = 256;
 	int ssid, osid, permission;
-	return 0;
 	
 	if(!inode){
 		// pr_err("mp4_inode_permission: inode is null\n");
@@ -425,16 +424,14 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		return 0;
 	}
 
-	if(!current_cred()->security){
-		ssid = MP4_NO_ACCESS;
-	} else {
+	if(current_cred()->security){
 		ssid = ((struct mp4_security *) current_cred()->security)->mp4_flags;
-	}
+	} 
 
 	osid = get_inode_sid(inode);
-	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
-	// 	return 0;
-	// }
+	if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
+		return 0;
+	}
 
 	// permission = mp4_has_permission(ssid, osid, mask);
 	// if(printk_ratelimit()) {
