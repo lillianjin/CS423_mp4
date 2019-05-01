@@ -408,7 +408,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		// pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
-
+	return 0;
 	// check if should skip
 	if(mp4_should_skip_path(checked_path)){
 		kfree(buffer);
