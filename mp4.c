@@ -377,13 +377,13 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	if(!inode){
 		// pr_err("mp4_inode_permission: inode is null\n");
-		return -EACCES;
+		return 0;
 	}
 
 	// no permission to check
 	if(!mask){
 		// pr_err("mp4_inode_permission: mask is null\n");
-		return -EACCES;
+		return 0;
 	}
 
 	//obtain the path of the inode being checked
@@ -391,23 +391,23 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	if(!dentry){
 		// pr_err("mp4_inode_permission: dentry is null\n");
-		return -EACCES;
+		return 0;
 	} 
 
 	buffer = kmalloc(size, GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
 		// pr_err("mp4_inode_permission: buffer not allocated\n");
-		return -EACCES;
+		return 0;
 	}
 
 	// get checked path
 	checked_path = dentry_path_raw(dentry, buffer, size);
-	if(!checked_path){
+	if(IS_ERR(checked_path)){
 		kfree(buffer);
 		dput(dentry);
 		// pr_err("mp4_inode_permission: path not found\n");
-		return -EACCES;
+		return 0;
 	}
 
 	// check if should skip
@@ -422,7 +422,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		kfree(buffer);
 		dput(dentry);
 		// pr_err("mp4_inode_permission: current cred not found\n");
-		return -EACCES;
+		return 0;
 	}
 
 	if(!current_cred()->security){
@@ -439,6 +439,10 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
 		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+	}
+	
+	if(permission){
+		return -EACCES;
 	}
 
 	kfree(buffer);
