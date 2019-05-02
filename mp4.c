@@ -425,7 +425,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(mp4_should_skip_path(checked_path)){
 		kfree(buffer);
 		dput(dentry);
-		pr_err("mp4_inode_permission: skip the path\n");
+		// pr_err("mp4_inode_permission: skip the path\n");
 		return 0;
 	}
 	
@@ -435,7 +435,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	dput(dentry);
 
 	if(!current_cred() || current_cred()->security){
-		pr_err("mp4_inode_permission: current cred not found\n");
+		// pr_err("mp4_inode_permission: current cred not found\n");
 		return 0;
 	}
 
