@@ -260,94 +260,95 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 
 	switch (osid)
 	{
-	case MP4_NO_ACCESS:
-		if(ssid == MP4_TARGET_SID){
-			rc = -EACCES;
-		} else {
-			rc = 0;
-			
-		}
-		break;
-
-	case MP4_READ_OBJ:
-	/* object may be read by anyone */
-		if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
-			rc = -EACCES;
-		} else {
-			rc = 0;
-		}
-		break;
-
-	case MP4_READ_WRITE:
-	/* object may read/written/appended by the target,
-	* but can only be read by others */
-		if(ssid == MP4_TARGET_SID){
-			if(mask & MAY_EXEC){
+		case MP4_NO_ACCESS:
+			if(ssid == MP4_TARGET_SID){
 				rc = -EACCES;
 			} else {
 				rc = 0;
+				
 			}
-		} else {
+			break;
+
+		case MP4_READ_OBJ:
+		/* object may be read by anyone */
 			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
 				rc = -EACCES;
 			} else {
 				rc = 0;
 			}
-		}
-		break;
+			break;
 
-	case MP4_WRITE_OBJ:
-	/* object may be written/appended by the target,
-	* but not read, and only read by others */
-		if(ssid == MP4_TARGET_SID){
-			if((mask & MAY_EXEC) || (mask & MAY_READ)){
-				rc = -EACCES;
+		case MP4_READ_WRITE:
+		/* object may read/written/appended by the target,
+		* but can only be read by others */
+			if(ssid == MP4_TARGET_SID){
+				if(mask & MAY_EXEC){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
 			} else {
-				rc = 0;
+				if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
 			}
-		} else{
-			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
-				rc = -EACCES;
-			} else {
-				rc = 0;
-			}
-		}
-		break;
+			break;
 
-	case MP4_EXEC_OBJ:
-	/* object may be read and executed by all */
-		if((mask & MAY_APPEND) || (mask & MAY_WRITE)){
-			rc = -EACCES;
-		} else {
-			rc = 0;
-		}
-		break;
+		case MP4_WRITE_OBJ:
+		/* object may be written/appended by the target,
+		* but not read, and only read by others */
+			if(ssid == MP4_TARGET_SID){
+				if((mask & MAY_EXEC) || (mask & MAY_READ)){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
+			} else {
+				if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
+			}
+			break;
 
-	case MP4_READ_DIR:
-	/* for directories that can be read/exec/access by all */
-		if(ssid == MP4_TARGET_SID){
-			if(mask & MAY_WRITE){
+		case MP4_EXEC_OBJ:
+		/* object may be read and executed by all */
+			if((mask & MAY_APPEND) || (mask & MAY_WRITE)){
 				rc = -EACCES;
 			} else {
 				rc = 0;
 			}
-		} else {
-			rc = 0;
-		}
-		break;
-	
-	case MP4_RW_DIR:
-	/* for directory that may be modified by the target program */
-		if(ssid == MP4_TARGET_SID){
-			if((mask & MAY_EXEC) || (mask & MAY_APPEND)){
-				rc = -EACCES;
+			break;
+
+		case MP4_READ_DIR:
+		/* for directories that can be read/exec/access by all */
+			if(ssid == MP4_TARGET_SID){
+				if(mask & MAY_WRITE){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
 			} else {
 				rc = 0;
 			}
-		} else{
-			rc = 0;
-		}
+			break;
+		
+		case MP4_RW_DIR:
+		/* for directory that may be modified by the target program */
+			if(ssid == MP4_TARGET_SID){
+				if((mask & MAY_EXEC) || (mask & MAY_APPEND)){
+					rc = -EACCES;
+				} else {
+					rc = 0;
+				}
+			} else{
+				rc = 0;
+			}
 	}
+
 	return rc;
 }
 
@@ -432,9 +433,9 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
 	// }
-	return 0;
 
 	permission = mp4_has_permission(ssid, osid, mask);
+	
 	if(printk_ratelimit()) {
 		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
 	}
