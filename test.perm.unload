@@ -1,4 +1,4 @@
-setfattr -x security.mp4 -v target /bin/cat 
-setfattr -x security.mp4 -v dir /home 
-setfattr -x security.mp4 -v dir /home/lujin2
-setfattr -x security.mp4 -v read-only /home/lujin2/file.txt
+sudo setfattr -x security.mp4 -v target /bin/cat 
+sudo setfattr -x security.mp4 -v dir /home 
+sudo setfattr -x security.mp4 -v dir /home/lujin2
+sudo setfattr -x security.mp4 -v read-only /home/lujin2/file.txt
