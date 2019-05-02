@@ -383,7 +383,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	struct dentry * dentry;
 	char * checked_path, * buffer;
 	int size = 255;
-	int ssid = MP4_NO_ACCESS, osid, permission;
+	int osid, permission, ssid = MP4_NO_ACCESS;
 	struct mp4_security * curr;
 
 	if(!inode){
@@ -441,9 +441,11 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		// pr_err("mp4_inode_permission: current cred not found\n");
 		return 0;
 	}
-	return 0;
+
 	curr = (struct mp4_security *)(current_cred()->security);
 	ssid = curr->mp4_flags;
+	return 0;
+
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
 	// }
