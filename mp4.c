@@ -383,7 +383,8 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	struct dentry * dentry;
 	char * checked_path, * buffer;
 	int size = 255;
-	int osid, permission, ssid = MP4_NO_ACCESS;
+	int osid, permission;
+	int ssid = MP4_NO_ACCESS;
 	struct mp4_security * curr;
 
 	if(!inode){
@@ -420,8 +421,9 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
+
 	if(printk_ratelimit()) {
-		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+		pr_info("mp4_inode_permission, PATH is %s\n", checked_path);
 	}
 
 	// check if should skip
@@ -444,7 +446,6 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	curr = (struct mp4_security *)(current_cred()->security);
 	ssid = curr->mp4_flags;
-	return 0;
 
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
@@ -452,6 +453,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	pr_info("mp4 after permission check..");
+	return 0;
 
 	if(printk_ratelimit()) {
 		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
