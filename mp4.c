@@ -387,28 +387,28 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	struct mp4_security * curr;
 
 	if(!inode){
-		// pr_err("mp4_inode_permission: inode is null\n");
+		pr_err("mp4_inode_permission: inode is null\n");
 		return 0;
 	}
 
 	// no permission to check
-	// if(!mask){
-	// 	// pr_err("mp4_inode_permission: mask is null\n");
-	// 	return 0;
-	// }
+	if(!mask){
+		pr_err("mp4_inode_permission: mask is null\n");
+		return 0;
+	}
 
 	//obtain the path of the inode being checked
 	dentry = d_find_alias(inode);
 
 	if(!dentry){
-		// pr_err("mp4_inode_permission: dentry is null\n");
+		pr_err("mp4_inode_permission: dentry is null\n");
 		return 0;
 	} 
 
 	buffer = kzalloc(size * sizeof(char), GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
-		// pr_err("mp4_inode_permission: buffer not allocated\n");
+		pr_err("mp4_inode_permission: buffer not allocated\n");
 		return 0;
 	}
 
@@ -417,7 +417,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(IS_ERR(checked_path)){
 		kfree(buffer);
 		dput(dentry);
-		// pr_err("mp4_inode_permission: path not found\n");
+		pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
 
@@ -425,7 +425,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(mp4_should_skip_path(checked_path)){
 		kfree(buffer);
 		dput(dentry);
-		// pr_err("mp4_inode_permission: skip the path\n");
+		pr_err("mp4_inode_permission: skip the path\n");
 		return 0;
 	}
 	
@@ -435,7 +435,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	dput(dentry);
 
 	if(!current_cred() || current_cred()->security){
-		// pr_err("mp4_inode_permission: current cred not found\n");
+		pr_err("mp4_inode_permission: current cred not found\n");
 		return 0;
 	}
 
