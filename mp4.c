@@ -420,6 +420,9 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
+	if(printk_ratelimit()) {
+		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+	}
 
 	// check if should skip
 	if(mp4_should_skip_path(checked_path)){
@@ -434,7 +437,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	kfree(buffer);
 	dput(dentry);
 
-	if(!current_cred() || current_cred()->security){
+	if(!current_cred() || !current_cred()->security){
 		// pr_err("mp4_inode_permission: current cred not found\n");
 		return 0;
 	}
