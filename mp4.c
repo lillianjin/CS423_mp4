@@ -181,11 +181,22 @@ static void mp4_cred_free(struct cred *cred)
 static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 			    gfp_t gfp)
 {
-	mp4_cred_alloc_blank(new, gfp);
-	// pr_info("mp4 prepare a new credential for modification..");
-	if(old && old->security){
-		new -> security = old -> security;
+	struct mp4_security *old_blob, *new_blob;
+	if(!new){
+		return -ENOENT;
 	}
+	new_blob = kzalloc(sizeof(struct mp4_security), gfp);
+	if(!new_blob){
+		return -ENOMEM;
+	}
+	if(old && old->security){
+		old_blob = old->security;
+		new_blob->mp4_flags = old_blob->mp4_flags;
+	} else {
+		new_blob->mp4_flags = MP4_NO_ACCESS;
+	}
+	new->security = new_blob;
+
 	return 0;
 }
 
