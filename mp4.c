@@ -257,6 +257,8 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	 * ...
 	 */
 	int rc = 0;
+	return rc;
+
 
 	switch (osid)
 	{
@@ -432,7 +434,6 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	// if(ssid == MP4_TARGET_SID && S_ISDIR(inode->i_mode)){
 	// 	return 0;
 	// }
-	return 0;
 
 	permission = mp4_has_permission(ssid, osid, mask);
 	if(printk_ratelimit()) {
