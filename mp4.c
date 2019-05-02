@@ -183,7 +183,7 @@ static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 {
 	mp4_cred_alloc_blank(new, gfp);
 	// pr_info("mp4 prepare a new credential for modification..");
-	if(old->security){
+	if(old && old->security){
 		new -> security = old -> security;
 	}
 	return 0;
