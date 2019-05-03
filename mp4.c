@@ -451,7 +451,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	// 	return 0;
 	// }
 
-	permission = mp4_has_permission(ssid, osid, mask);
+	// permission = mp4_has_permission(ssid, osid, mask);
 	pr_info("mp4 after permission check..");
 	return 0;
 
