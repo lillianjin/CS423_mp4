@@ -451,13 +451,12 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	// 	return 0;
 	// }
 
-	// permission = mp4_has_permission(ssid, osid, mask);
+	permission = mp4_has_permission(ssid, osid, mask);
 	// pr_info("mp4 after permission check..");
-	return 0;
 
-	if(printk_ratelimit()) {
-		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
-	}
+	// if(printk_ratelimit()) {
+	// 	pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+	// }
 
 	return permission;
 }
