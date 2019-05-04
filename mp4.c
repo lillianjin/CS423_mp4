@@ -90,8 +90,6 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 
 	int sid;
 	struct mp4_security * curr;
-	
-	// pr_info("mp4 set credentials for a new task..");
 
 	// if creds already prepared
 	if (bprm->cred_prepared){
@@ -117,6 +115,9 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 		curr->mp4_flags = sid;
 	}
 
+	if(printk_ratelimit()){
+	pr_info("mp4_bprm_set_creds: set credentials for a new task..");
+	}
 	return 0;
 }
 
@@ -134,7 +135,6 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	 * ...
 	 */
 	struct mp4_security * new_blob;
-	// pr_info("mp4 allocates a blank label..");
 	if(!cred){
 		return -ENOENT;
 	}
@@ -146,6 +146,10 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	new_blob -> mp4_flags = MP4_NO_ACCESS;
 	// hook the pointer to new blob
 	cred -> security = new_blob;
+
+	if(printk_ratelimit()){
+	pr_info("mp4_cred_alloc_blank: allocates a blank label..");
+	}
 	return 0;
 }
 
@@ -162,12 +166,12 @@ static void mp4_cred_free(struct cred *cred)
 	 * Add your code here
 	 * ...
 	 */
-	// pr_info("mp4 free a security label..");
 	if(!cred || !cred->security){
 		return;
 	}
 	kfree(cred -> security);
 	cred->security = NULL;
+	pr_info("mp4_cred_free: free a security label");
 }
 
 /**
@@ -197,6 +201,9 @@ static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 	}
 	new->security = new_blob;
 
+	if(printk_ratelimit()){
+	pr_info("mp4_cred_prepare: prepare a security label for new blob");
+	}
 	return 0;
 }
 
@@ -247,6 +254,10 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 			return -ENOMEM;
 		}
 		*value = tmp;
+	}
+	
+	if(printk_ratelimit()){
+	pr_info("mp4_inode_init_security: initialize the security for inode");
 	}
 	return 0;
 }
@@ -388,13 +399,13 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	struct mp4_security * curr;
 
 	if(!inode){
-		pr_err("mp4_inode_permission: inode is null\n");
+		// pr_err("mp4_inode_permission: inode is null\n");
 		return 0;
 	}
 
 	// no permission to check
 	if(!mask){
-		pr_err("mp4_inode_permission: mask is null\n");
+		// pr_err("mp4_inode_permission: mask is null\n");
 		return 0;
 	}
 
@@ -402,14 +413,14 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	dentry = d_find_alias(inode);
 
 	if(!dentry){
-		pr_err("mp4_inode_permission: dentry is null\n");
+		// pr_err("mp4_inode_permission: dentry is null\n");
 		return 0;
 	} 
 
 	buffer = kzalloc(size * sizeof(char), GFP_KERNEL);
 	if(!buffer){
 		dput(dentry);
-		pr_err("mp4_inode_permission: buffer not allocated\n");
+		// pr_err("mp4_inode_permission: buffer not allocated\n");
 		return 0;
 	}
 
@@ -418,13 +429,10 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	if(IS_ERR(checked_path)){
 		kfree(buffer);
 		dput(dentry);
-		pr_err("mp4_inode_permission: path not found\n");
+		// pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
 
-	if(printk_ratelimit()) {
-		pr_info("mp4_inode_permission, PATH is %s\n", checked_path);
-	}
 
 	// check if should skip
 	if(mp4_should_skip_path(checked_path)){
@@ -452,10 +460,15 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	// }
 
 	permission = mp4_has_permission(ssid, osid, mask);
-	// pr_info("mp4 after permission check..");
 
-	if(printk_ratelimit()) {
-		pr_info("SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+	if(permission){
+		if(printk_ratelimit()) {
+			pr_info("DENIED! SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+		}
+	}
+
+	if(printk_ratelimit()){
+		pr_info("mp4_inode_permission: permission check has finished");
 	}
 
 	return permission;
