@@ -116,7 +116,7 @@ static int mp4_bprm_set_creds(struct linux_binprm *bprm)
 	}
 
 	if(printk_ratelimit()){
-	pr_info("mp4_bprm_set_creds: set credentials for a new task..");
+		pr_info("mp4_bprm_set_creds: set credentials for a new task..");
 	}
 	return 0;
 }
@@ -148,7 +148,7 @@ static int mp4_cred_alloc_blank(struct cred *cred, gfp_t gfp)
 	cred -> security = new_blob;
 
 	if(printk_ratelimit()){
-	pr_info("mp4_cred_alloc_blank: allocates a blank label..");
+		pr_info("mp4_cred_alloc_blank: allocates a blank label..");
 	}
 	return 0;
 }
@@ -171,7 +171,9 @@ static void mp4_cred_free(struct cred *cred)
 	}
 	kfree(cred -> security);
 	cred->security = NULL;
-	pr_info("mp4_cred_free: free a security label");
+	if(printk_ratelimit()){
+		pr_info("mp4_cred_free: free a security label");
+	}
 }
 
 /**
@@ -202,7 +204,7 @@ static int mp4_cred_prepare(struct cred *new, const struct cred *old,
 	new->security = new_blob;
 
 	if(printk_ratelimit()){
-	pr_info("mp4_cred_prepare: prepare a security label for new blob");
+		pr_info("mp4_cred_prepare: prepare a security label for new blob");
 	}
 	return 0;
 }
@@ -257,7 +259,7 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	}
 	
 	if(printk_ratelimit()){
-	pr_info("mp4_inode_init_security: initialize the security for inode");
+		pr_info("mp4_inode_init_security: initialize the security for inode");
 	}
 	return 0;
 }
