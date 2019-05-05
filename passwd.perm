@@ -2,12 +2,12 @@ sudo setfattr -n security.mp4 -v target /usr/bin/passwd
 sudo setfattr -n security.mp4 -v dir /home
 sudo setfattr -n security.mp4 -v dir /home/lujin2
 sudo setfattr -n security.mp4 -v dir /var/lib/sss
-sudo setfattr -n security.mp4 -v dir /etc/security
-sudo setfattr -n security.mp4 -v dir /var/lib/sss/mc
-sudo setfattr -n security.mp4 -v dir /etc
-sudo setfattr -n security.mp4 -v dir /etc/pam.d
-sudo setfattr -n security.mp4 -v dir /var
 sudo setfattr -n security.mp4 -v dir /var/lib
+sudo setfattr -n security.mp4 -v dir /etc
+sudo setfattr -n security.mp4 -v dir /var/lib/sss/mc
+sudo setfattr -n security.mp4 -v dir /var
+sudo setfattr -n security.mp4 -v dir /etc/pam.d
+sudo setfattr -n security.mp4 -v dir /etc/security
 sudo setfattr -n security.mp4 -v read-only /etc/ld.so.cache
 sudo setfattr -n security.mp4 -v read-only /etc/nsswitch.conf
 sudo setfattr -n security.mp4 -v read-only /etc/passwd
@@ -24,4 +24,3 @@ sudo setfattr -n security.mp4 -v read-only /etc/krb5.conf
 sudo setfattr -n security.mp4 -v read-only /etc/login.defs
 sudo setfattr -n security.mp4 -v read-only /etc/shadow
 sudo setfattr -n security.mp4 -v write-only /etc/.pwd.lock
-sudo setfattr -n security.mp4 -v write-only /etc/nshadow

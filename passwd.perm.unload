@@ -2,12 +2,12 @@ sudo setfattr -x security.mp4 /usr/bin/passwd
 sudo setfattr -x security.mp4 /home
 sudo setfattr -x security.mp4 /home/lujin2
 sudo setfattr -x security.mp4 /var/lib/sss
-sudo setfattr -x security.mp4 /etc/security
-sudo setfattr -x security.mp4 /var/lib/sss/mc
-sudo setfattr -x security.mp4 /etc
-sudo setfattr -x security.mp4 /etc/pam.d
-sudo setfattr -x security.mp4 /var
 sudo setfattr -x security.mp4 /var/lib
+sudo setfattr -x security.mp4 /etc
+sudo setfattr -x security.mp4 /var/lib/sss/mc
+sudo setfattr -x security.mp4 /var
+sudo setfattr -x security.mp4 /etc/pam.d
+sudo setfattr -x security.mp4 /etc/security
 sudo setfattr -x security.mp4 /etc/ld.so.cache
 sudo setfattr -x security.mp4 /etc/nsswitch.conf
 sudo setfattr -x security.mp4 /etc/passwd
@@ -24,4 +24,3 @@ sudo setfattr -x security.mp4 /etc/krb5.conf
 sudo setfattr -x security.mp4 /etc/login.defs
 sudo setfattr -x security.mp4 /etc/shadow
 sudo setfattr -x security.mp4 /etc/.pwd.lock
-sudo setfattr -x security.mp4 /etc/nshadow
