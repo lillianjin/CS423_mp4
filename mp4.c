@@ -334,19 +334,19 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 			} 
 			break;
 
-		case MP4_READ_DIR:
-		/* for directories that can be read/exec/access by all */
-			if(ssid == MP4_TARGET_SID){
-				if(mask & MAY_WRITE){
-					rc = -EACCES;
-				}
-			}
-			break;
+		// case MP4_READ_DIR:
+		// /* for directories that can be read/exec/access by all */
+		// 	if(ssid == MP4_TARGET_SID){
+		// 		if(mask & MAY_WRITE){
+		// 			rc = -EACCES;
+		// 		}
+		// 	}
+		// 	break;
 		
 		case MP4_RW_DIR:
 		/* for directory that may be modified by the target program */
 			if(ssid == MP4_TARGET_SID){
-				if((mask & MAY_EXEC) || (mask & MAY_APPEND)){
+				if((mask & MAY_EXEC)){
 					rc = -EACCES;
 				}
 			} 
