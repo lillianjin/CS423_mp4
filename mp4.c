@@ -451,10 +451,10 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		if(printk_ratelimit()) {
 			pr_info("DENIED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
 		}
-	}
-
-	if(printk_ratelimit()){
-		pr_info("mp4_inode_permission: permission check has finished");
+	} else {
+		if(printk_ratelimit()){
+			pr_info("SUCCEEDED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
+		}
 	}
 
 	return permission;
