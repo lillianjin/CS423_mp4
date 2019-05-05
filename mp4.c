@@ -240,8 +240,8 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	sid = get_inode_sid(inode);
 	if(sid == MP4_TARGET_SID) {
 		if(XATTR_NAME_MP4){
-			*name = XATTR_NAME_MP4;
-			*len = sizeof(XATTR_NAME_MP4);
+			*name = XATTR_MP4_SUFFIX;
+			*len = sizeof(XATTR_MP4_SUFFIX);
 		} else {
 			return -ENOMEM;
 		}
