@@ -247,9 +247,9 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	sid = get_inode_sid(inode);
 	if(sid == MP4_TARGET_SID) {
 		if(S_ISDIR(inode->i_mode)) {
-			tmp = kstrdup("dir-write", GFP_KERNEL);
+			valtmp = kstrdup("dir-write", GFP_KERNEL);
 		} else {
-			tmp = kstrdup("read-write", GFP_KERNEL);
+			valtmp = kstrdup("read-write", GFP_KERNEL);
 		}
 		if(!valtmp){
 			return -ENOMEM;
