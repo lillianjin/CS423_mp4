@@ -75,10 +75,10 @@ sudo setfattr -n security.mp4 -v read-only /etc/login.defs
 sudo setfattr -n security.mp4 -v read-only /etc/shadow
 sudo setfattr -n security.mp4 -v write-only /etc/.pwd.lock
 sudo setfattr -n security.mp4 -v write-only /etc/nshadow
-sudo setfattr -n security.mp4 -v dir-write /etc/security
-sudo setfattr -n security.mp4 -v dir-write /etc
-sudo setfattr -n security.mp4 -v dir-write /var/lib/sss/mc
-sudo setfattr -n security.mp4 -v dir-write /var
-sudo setfattr -n security.mp4 -v dir-write /var/lib
-sudo setfattr -n security.mp4 -v dir-write /etc/pam.d
-sudo setfattr -n security.mp4 -v dir-write /var/lib/sss
+sudo setfattr -n security.mp4 -v dir /etc/security
+sudo setfattr -n security.mp4 -v dir /etc
+sudo setfattr -n security.mp4 -v dir /var/lib/sss/mc
+sudo setfattr -n security.mp4 -v dir /var
+sudo setfattr -n security.mp4 -v dir /var/lib
+sudo setfattr -n security.mp4 -v dir /etc/pam.d
+sudo setfattr -n security.mp4 -v dir /var/lib/sss
