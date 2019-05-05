@@ -238,7 +238,7 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 		return -EOPNOTSUPP;
 	}
 
-	sid = get_inode_sid(inode);
+	sid = (current_cred() -> security) -> mp4_flag;
 	if(sid == MP4_TARGET_SID) {
 		nametmp = kstrdup(XATTR_MP4_SUFFIX, GFP_KERNEL);
 		if(!nametmp){
