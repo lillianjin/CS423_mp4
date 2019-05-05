@@ -281,6 +281,9 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	 * ...
 	 */
 	int rc = 0;
+	if(!((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_READ) || (mask & MAY_APPEND))){
+		return rc;
+	}
 
 	switch (osid)
 	{
