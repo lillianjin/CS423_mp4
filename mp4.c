@@ -231,31 +231,33 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 	 * ...
 	 */
 	int sid;
-	char *tmp;
+	char *valtmp;
+	char *nametmp;
 
 	if( !dir || !inode || !current_cred() || !(current_cred() -> security)) {
 		return -EOPNOTSUPP;
 	}
 
+	nametmp = kstrdup(XATTR_MP4_SUFFIX, GFP_KERNEL);
+	if(!nametmp){
+		return -ENOMEM;
+	}
+	*name = nametmp;
+
 	sid = get_inode_sid(inode);
 	if(sid == MP4_TARGET_SID) {
-		if(XATTR_NAME_MP4){
-			*name = XATTR_MP4_SUFFIX;
-			*len = sizeof(XATTR_MP4_SUFFIX);
-		} else {
-			return -ENOMEM;
-		}
-
 		if(S_ISDIR(inode->i_mode)) {
 			tmp = kstrdup("dir-write", GFP_KERNEL);
 		} else {
 			tmp = kstrdup("read-write", GFP_KERNEL);
 		}
-
-		if(!tmp){
+		if(!valtmp){
 			return -ENOMEM;
 		}
-		*value = tmp;
+		*len = strlen(valtmp);
+		*value = valtmp;
+	} else {
+		return -EOPNOTSUPP;
 	}
 	
 	if(printk_ratelimit()){
