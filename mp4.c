@@ -285,20 +285,17 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 	switch (osid)
 	{
 		case MP4_NO_ACCESS:
+		/* may not be accessed by target,
+		* but may by everyone else */
 			if(ssid == MP4_TARGET_SID){
 				rc = -EACCES;
-			} else {
-				rc = 0;
-				
-			}
+			} 
 			break;
 
 		case MP4_READ_OBJ:
 		/* object may be read by anyone */
 			if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
 				rc = -EACCES;
-			} else {
-				rc = 0;
 			}
 			break;
 
@@ -308,14 +305,10 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 			if(ssid == MP4_TARGET_SID){
 				if(mask & MAY_EXEC){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
 			} else {
 				if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
 			}
 			break;
@@ -326,14 +319,10 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 			if(ssid == MP4_TARGET_SID){
 				if((mask & MAY_EXEC) || (mask & MAY_READ)){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
 			} else {
 				if((mask & MAY_WRITE) || (mask & MAY_EXEC) || (mask & MAY_APPEND)){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
 			}
 			break;
@@ -342,9 +331,7 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 		/* object may be read and executed by all */
 			if((mask & MAY_APPEND) || (mask & MAY_WRITE)){
 				rc = -EACCES;
-			} else {
-				rc = 0;
-			}
+			} 
 			break;
 
 		case MP4_READ_DIR:
@@ -352,11 +339,7 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 			if(ssid == MP4_TARGET_SID){
 				if(mask & MAY_WRITE){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
-			} else {
-				rc = 0;
 			}
 			break;
 		
@@ -365,12 +348,8 @@ static int mp4_has_permission(int ssid, int osid, int mask)
 			if(ssid == MP4_TARGET_SID){
 				if((mask & MAY_EXEC) || (mask & MAY_APPEND)){
 					rc = -EACCES;
-				} else {
-					rc = 0;
 				}
-			} else{
-				rc = 0;
-			}
+			} 
 	}
 
 	return rc;
@@ -465,7 +444,7 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 
 	if(permission){
 		if(printk_ratelimit()) {
-			pr_info("DENIED! SSID: %d, OSID:%d, mask:%d. permission: %d\n", ssid, osid, mask, permission);
+			pr_info("DENIED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
 		}
 	}
 
