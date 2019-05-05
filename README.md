@@ -42,8 +42,9 @@ Using a dummy user to check the permission of the file processes.
 1) Create a dummy user: `sudo adduser dummy`
 2) Strace the log during the updating process: `sudo strace -o p.log passwd dummy`.  
 3) Used `exract_permit.ipynb` to extract the least policy and create new test cases `passwd.perm` and `passwd.perm.unload`.  
-4) Load the script and try to update the passward again.
+4) Load the script and try to update the passward again. 
 `source passwd.perm`  
-`sudo strace -e open -o log passwd dummy`
+`sudo passwd dummy`  
 `source passwd.perm.unload`  
+We can also check the log of this process by `sudo strace -e open -o log passwd dummy`  
 
