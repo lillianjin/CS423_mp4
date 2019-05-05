@@ -238,14 +238,14 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 		return -EOPNOTSUPP;
 	}
 
-	nametmp = kstrdup(XATTR_MP4_SUFFIX, GFP_KERNEL);
-	if(!nametmp){
-		return -ENOMEM;
-	}
-	*name = nametmp;
-
 	sid = get_inode_sid(inode);
 	if(sid == MP4_TARGET_SID) {
+		nametmp = kstrdup(XATTR_MP4_SUFFIX, GFP_KERNEL);
+		if(!nametmp){
+			return -ENOMEM;
+		}
+		*name = nametmp;
+
 		if(S_ISDIR(inode->i_mode)) {
 			valtmp = kstrdup("dir-write", GFP_KERNEL);
 		} else {
@@ -256,9 +256,7 @@ static int mp4_inode_init_security(struct inode *inode, struct inode *dir,
 		}
 		*len = strlen(valtmp);
 		*value = valtmp;
-	} else {
-		return -EOPNOTSUPP;
-	}
+	} 
 	
 	if(printk_ratelimit()){
 		pr_info("mp4_inode_init_security: initialize the security for inode");
