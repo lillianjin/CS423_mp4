@@ -1,6 +1,6 @@
 # MP4
 
-## Design Decision
+## Part 1: Design Decision
 
 #### 1.mp4_cred_alloc_blank
 Allocate a blank mp4 security label.
@@ -26,7 +26,7 @@ If the sid of the inode is `MP4_TARGET_SID`, I initilized the value as `read-wri
 In this hook, I checked the permission for an inode being opened. First, get the path of a valid inode and check if the path should be skip using the function `mp4_should_skip_path`.  
 After that, get the sid and oid of the inode and pass into the function `mp4_has_permission`. This policy was designed based on the provided hfile. One important part is that we need to set seperate policies for target and non-target processes.
 
-### Test cases 
+## Part 2: Test cases 
 #### a. `test.perm` and `test.perm.unload`
 This set of test cases are used to check the basic permission of our built kernel. I adjust the flag of `file.txt` and can notice the differences between each modification.
 
@@ -47,4 +47,19 @@ Using a dummy user to check the permission of the file processes.
 `sudo passwd dummy`  
 `source passwd.perm.unload`  
 We can also check the log of this process by `sudo strace -e open -o log passwd dummy`  
+The sample result after ed
+![picture0](screenshot/passwd_test.png)
 
+## Part 3: Screenshot
+Using `dmesg|grep [key word]` to check if the specific function has finished running. The screenshots for the functions I implemented are as follows.  
+1) mp4_inode_init_security
+![picture1](screenshot/mp4_inode_init_security.png)
+2) mp4_cred_prepare
+![picture2](screenshot/mp4_cred_prepare.png)
+3) mp4_cred_free
+![picture3](screenshot/mp4_cred_free.png)
+4) mp4_bprm_set_creds
+![picture4](screenshot/mp4_bprm_set_creds.png)
+5) mp4_inode_permission
+![picture5](screenshot/mp4_inode_permission.png)
+![picture6](screenshot/mp4_inode_permission_deny.png)
