@@ -416,7 +416,9 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		// pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
-
+	if(printk_ratelimit()) {
+		pr_info("path: %s\n", checked_path);
+	}
 
 	// check if should skip
 	if(mp4_should_skip_path(checked_path)){
