@@ -1,4 +1,5 @@
 sudo setfattr -x security.mp4 /bin/cat 
 sudo setfattr -x security.mp4 /home 
 sudo setfattr -x security.mp4 /home/lujin2
-sudo setfattr -x security.mp4 /home/lujin2/file.txt
+sudo setfattr -x security.mp4 /home/lujin2/read_only.txt
+sudo setfattr -x security.mp4 /home/lujin2/write_only.txt
