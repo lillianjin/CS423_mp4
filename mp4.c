@@ -416,9 +416,6 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 		// pr_err("mp4_inode_permission: path not found\n");
 		return 0;
 	}
-	if(printk_ratelimit()) {
-		pr_info("path: %s\n", checked_path);
-	}
 
 	// check if should skip
 	if(mp4_should_skip_path(checked_path)){
@@ -448,9 +445,8 @@ static int mp4_inode_permission(struct inode *inode, int mask)
 	permission = mp4_has_permission(ssid, osid, mask);
 
 	if(permission){
-		if(printk_ratelimit()) {
-			pr_info("DENIED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
-		}
+		pr_info("DENIED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
+		
 	} else {
 		if(printk_ratelimit()){
 			pr_info("SUCCEEDED! SSID: %d, OSID:%d, mask:%d, permission: %d, path: %s\n", ssid, osid, mask, permission, checked_path);
