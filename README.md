@@ -28,12 +28,24 @@ After that, get the sid and oid of the inode and pass into the function `mp4_has
 
 ## Part 2: Test cases 
 #### a. `test.perm` and `test.perm.unload`
-This set of test cases are used to check the basic permission of our built kernel. I adjust the flag of `file.txt` and can notice the differences between each modification.
+This set of test cases are used to check the basic permission of our built kernel. I set attribute for file `read_only.txt` and `write_only` and want to know the differences of write_only and read_only modification. 
 
 To run the tests:
 Source the script: `source test.perm`  
-At home directory, `cat file.txt`, `touch testfile.txt`  
+At home directory:  
+`cat read_only.txt`, `vim read_only.txt`  
+`cat write_only.txt`, `vim write_only.txt`  
 Unloaded script:`source test.perm.unload`
+
+Expected Results:  
+`cat read_only.txt` & `cat write_only.txt`  
+![picture6](screenshot/cat_read-only_write-only.png)
+`vim read_only.txt`  
+![picture7](screenshot/vim_read_only.png)
+`vim write_only.txt`  
+![picture7](screenshot/vim_write_only.png)
+`dmesg` of Denied cases  
+![picture8](screenshot/demsg_DENIED.png)
 
 
 #### b. `passwd.perm` and `passwd.perm.unload`
@@ -47,8 +59,8 @@ Using a dummy user to check the permission of the file processes.
 `sudo passwd dummy`  
 `source passwd.perm.unload`  
 We can also check the log of this process by `sudo strace -e open -o log passwd dummy`  
-The sample result after ed
-![picture0](screenshot/passwd_test.png)
+The sample result after editing the password should be
+![picture10](screenshot/passwd_test.png)
 
 ## Part 3: Screenshot
 Using `dmesg|grep [key word]` to check if the specific function has finished running. The screenshots for the functions I implemented are as follows.  
